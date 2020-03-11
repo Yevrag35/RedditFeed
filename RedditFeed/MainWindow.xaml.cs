@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Linq;
 using System.Text;
@@ -24,6 +26,7 @@ namespace RedditFeed
         private bool _isLoading = true;
 
         internal JsonSettings AllPreferences;
+        //internal PostCollection Posts;
         internal PostCollection Posts;
 
         public string SubredditLabel
@@ -38,23 +41,34 @@ namespace RedditFeed
 
             InitializeComponent();
             this.SRText.Text = this.AllPreferences.Preferences.Subreddit;
-            var feed = new RssFeed(this.AllPreferences.Preferences.SubredditUrl);
-            feed.GetFeed();
-            this.Posts = feed.GetPosts();
+            this.Posts = PostCollection.LoadFeed(this.AllPreferences.Preferences.SubredditUrl, this.AllPreferences.Preferences.Range);
+            this.Posts.CollectionChanged += this.OnFeedChange;
 
-            this.Posts.UpdateView();
-            this.Posts.AddSortDescription(x => x.Updated, ListSortDirection.Descending);
+            //this.Posts.AddSortDescription(x => x.Updated, ListSortDirection.Descending);
 
             this.RedditList.ItemsSource = this.Posts.View;
-            this.RedditList.Items.Refresh();
 
             _isLoading = false;
         }
 
         #region LOAD FEED
-        private void LoadFeed()
+        private void OnFeedChange(object sender, NotifyCollectionChangedEventArgs e)
         {
+            if (e.Action == NotifyCollectionChangedAction.Reset)
+            {
+                this.Dispatcher.Invoke(() =>
+                {
+                    ((MainWindow)Application.Current.MainWindow).RedditList.Items.Refresh();
+                });
+                
+                //((MainWindow)Application.Current.MainWindow).RedditList.ItemsSource = ((MainWindow)Application.Current.MainWindow).Posts.View;
+                //((MainWindow)Application.Current.MainWindow).RedditList.Items.Refresh();
+            }
+        }
 
+        private void TriggerBtn_Click(object sender, RoutedEventArgs e)
+        {
+            
         }
 
         #endregion
@@ -73,13 +87,27 @@ namespace RedditFeed
             this.SRLabel.IsEnabled = false;
             this.SRText.Visibility = Visibility.Visible;
         }
-        private void SRLabel_IsEnabledChanged(object sender, DependencyPropertyChangedEventArgs e)
+        private async void SRLabel_IsEnabledChanged(object sender, DependencyPropertyChangedEventArgs e)
         {
             if (this.SRLabel.IsEnabled && !this.SRLabel.Content.Equals(this.SRText.Text))
             {
                 this.SRLabel.Content = this.SRText.Text;
                 this.AllPreferences.SaveSubreddit(this.SRText.Text, false);
                 this.SRLabel.Visibility = Visibility.Visible;
+
+                List<Post> posts = await ((MainWindow)Application.Current.MainWindow).Posts.ReloadFeed(
+                    ((MainWindow)Application.Current.MainWindow).AllPreferences.Preferences.SubredditUrl,
+                    ((MainWindow)Application.Current.MainWindow).AllPreferences.Preferences.Range
+                );
+                await this.Dispatcher.InvokeAsync(() =>
+                {
+                    ((MainWindow)Application.Current.MainWindow).Posts.Clear();
+                    foreach (Post p in posts)
+                    {
+                        ((MainWindow)Application.Current.MainWindow).Posts.Add(p);
+                    }
+                    //((MainWindow)Application.Current.MainWindow).TriggerBtn.RaiseEvent(click);
+                });
             }
         }
 

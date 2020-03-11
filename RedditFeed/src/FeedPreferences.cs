@@ -35,8 +35,11 @@ namespace RedditFeed
             {
                 Subreddit = Resources.DefaultSubreddit;
             }
-            this.SubredditUrl = new Uri(string.Format(Resources.RedditUrlFormat, Subreddit), UriKind.Absolute);
+            this.SetUrl(new Uri(string.Format(Resources.RedditUrlFormat, Subreddit), UriKind.Absolute));
         }
+
+        internal void UpdateUrl() => this.SubredditUrl = new Uri(string.Format(Resources.RedditUrlFormat, this.Subreddit), UriKind.Absolute);
+        public void SetUrl(Uri newUrl) => this.SubredditUrl = newUrl;
 
         #endregion
     }

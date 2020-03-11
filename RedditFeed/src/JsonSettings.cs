@@ -79,6 +79,7 @@ namespace RedditFeed
             if (newSub != this.Preferences.Subreddit && !isLoading)
             {
                 this.Preferences.Subreddit = newSub;
+                this.Preferences.UpdateUrl();
                 this.Save();
             }
         }

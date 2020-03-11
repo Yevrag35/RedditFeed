@@ -164,18 +164,23 @@
             </ListView.View>
         </ListView>
         <Button Content="Feed Settings" HorizontalAlignment="Left" Margin="40,0,0,0" VerticalAlignment="Top" Width="95" Height="39"/>
-        <Label x:Name="SRLabel" Content="{Binding Path=SubredditLabel}" Visibility="Visible" Margin="310,8,0,0"
-               VerticalAlignment="Top" Width="185" Height="24" HorizontalAlignment="Left"
-               FontFamily="Gill Sans MT" FontSize="15" FontWeight="Bold" 
+        <!--  Content="placeHolder" -->
+        <Label x:Name="SRLabel" Content="{Binding Path=SubredditLabel}" Visibility="Visible" Margin="313,6,0,0"
+               VerticalAlignment="Top" Width="185" Height="26" HorizontalAlignment="Left"
+               FontFamily="Gill Sans MT" FontSize="15" FontWeight="Bold"
                MouseDoubleClick="Label_MouseDoubleClick"
                IsEnabledChanged="SRLabel_IsEnabledChanged"/>
         <TextBox x:Name="SRText" HorizontalAlignment="Left" Margin="310,8,0,0" Visibility="Hidden"
-                 Text="" TextWrapping="Wrap" VerticalAlignment="Top" Width="185" Height="24"
+                 Text="placeHolder" TextWrapping="Wrap" VerticalAlignment="Top" Width="185" Height="24"
                  FontSize="14" FontFamily="MS Comic Sans" VerticalContentAlignment="Center" FontWeight="Bold"
                  PreviewMouseLeftButtonDown="SRText_PreviewMouseLeftButtonDown"
                  GotKeyboardFocus="SRText_GotKeyboardFocus"
                  PreviewKeyDown="SRText_PreviewKeyDown"/>
         <Label Content="Subreddit:" HorizontalAlignment="Left" Margin="227,6,0,0" VerticalAlignment="Top"
                FontFamily="Gill Sans MT" FontSize="15" FontWeight="Bold"/>
+        
+        <!-- HIDDEN TRIGGER -->
+        <Button x:Name="TriggerBtn" Visibility="Hidden" IsHitTestVisible="False" Focusable="False" Width="0" Height="0"
+                Click="TriggerBtn_Click"/>
     </Grid>
 </Window>
