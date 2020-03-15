@@ -15,6 +15,9 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+//using System.Windows.Threading;
+
+//using Thread = System.Threading.Thread;
 
 namespace RedditFeed
 {
@@ -23,7 +26,14 @@ namespace RedditFeed
     /// </summary>
     public partial class MainWindow : Window
     {
-        private bool _isLoading = true;
+        //private static readonly string[] DOTS = new string[3]
+        //{
+        //    ".",
+        //    "..",
+        //    "..."
+        //};
+        private static bool _isLoading = true;
+        //private const string LOADING_FORMAT = "Loading{0}";
 
         internal JsonSettings AllPreferences;
         //internal PostCollection Posts;
@@ -42,7 +52,7 @@ namespace RedditFeed
             InitializeComponent();
             this.SRText.Text = this.AllPreferences.Preferences.Subreddit;
             this.Posts = PostCollection.LoadFeed(this.AllPreferences.Preferences.SubredditUrl, this.AllPreferences.Preferences.Range);
-            this.Posts.CollectionChanged += this.OnFeedChange;
+            //this.Posts.CollectionChanged += this.OnFeedChange;
 
             //this.Posts.AddSortDescription(x => x.Updated, ListSortDirection.Descending);
 
@@ -52,23 +62,50 @@ namespace RedditFeed
         }
 
         #region LOAD FEED
-        private void OnFeedChange(object sender, NotifyCollectionChangedEventArgs e)
-        {
-            if (e.Action == NotifyCollectionChangedAction.Reset)
-            {
-                this.Dispatcher.Invoke(() =>
-                {
-                    ((MainWindow)Application.Current.MainWindow).RedditList.Items.Refresh();
-                });
-                
-                //((MainWindow)Application.Current.MainWindow).RedditList.ItemsSource = ((MainWindow)Application.Current.MainWindow).Posts.View;
-                //((MainWindow)Application.Current.MainWindow).RedditList.Items.Refresh();
-            }
-        }
+        //private async void LoadingLbl_IsVisibleChanged(object sender, DependencyPropertyChangedEventArgs e)
+        //{
+        //    if (this.LoadingLbl.Visibility == Visibility.Visible)
+        //    {
+        //        _isLoading = true;
+        //        this.LoadingLbl.Content = string.Format(LOADING_FORMAT, string.Empty);
+        //        await this.LoopDots();
+        //    }
+        //}
+        //private async Task LoopDots()
+        //{
+        //    //await this.Dispatcher.InvokeAsync(() =>
+        //    //{
+        //    //    
+        //    //}, DispatcherPriority.Background);
+        //    while (_isLoading)
+        //    {
+        //        for (int i = 0; i < DOTS.Length; i++)
+        //        {
+        //            ((MainWindow)Application.Current.MainWindow).LoadingLbl.Content = string.Format(LOADING_FORMAT, DOTS[i]);
+        //            Thread.Sleep(800);
+        //        }
+        //    }
 
-        private void TriggerBtn_Click(object sender, RoutedEventArgs e)
+        //    await this.Dispatcher.InvokeAsync(() =>
+        //    {
+        //        ((MainWindow)Application.Current.MainWindow).LoadingLbl.Visibility = Visibility.Hidden;
+        //    });
+        //}
+        private async Task ReloadAsync(Uri subreddit, PostRange range)
         {
-            
+            List<Post> posts = await ((MainWindow)Application.Current.MainWindow).Posts.ReloadFeed(
+                subreddit,
+                range
+            );
+            //_isLoading = false;
+            await this.Dispatcher.InvokeAsync(() =>
+            {
+                ((MainWindow)Application.Current.MainWindow).Posts.Clear();
+                foreach (Post p in posts)
+                {
+                    ((MainWindow)Application.Current.MainWindow).Posts.Add(p);
+                }
+            });
         }
 
         #endregion
@@ -81,12 +118,7 @@ namespace RedditFeed
             }
         }
 
-        private void Label_MouseDoubleClick(object sender, MouseButtonEventArgs e)
-        {
-            this.SRLabel.Visibility = Visibility.Hidden;
-            this.SRLabel.IsEnabled = false;
-            this.SRText.Visibility = Visibility.Visible;
-        }
+        
         private async void SRLabel_IsEnabledChanged(object sender, DependencyPropertyChangedEventArgs e)
         {
             if (this.SRLabel.IsEnabled && !this.SRLabel.Content.Equals(this.SRText.Text))
@@ -95,20 +127,14 @@ namespace RedditFeed
                 this.AllPreferences.SaveSubreddit(this.SRText.Text, false);
                 this.SRLabel.Visibility = Visibility.Visible;
 
-                List<Post> posts = await ((MainWindow)Application.Current.MainWindow).Posts.ReloadFeed(
-                    ((MainWindow)Application.Current.MainWindow).AllPreferences.Preferences.SubredditUrl,
-                    ((MainWindow)Application.Current.MainWindow).AllPreferences.Preferences.Range
-                );
-                await this.Dispatcher.InvokeAsync(() =>
-                {
-                    ((MainWindow)Application.Current.MainWindow).Posts.Clear();
-                    foreach (Post p in posts)
-                    {
-                        ((MainWindow)Application.Current.MainWindow).Posts.Add(p);
-                    }
-                    //((MainWindow)Application.Current.MainWindow).TriggerBtn.RaiseEvent(click);
-                });
+                await this.ReloadAsync(this.AllPreferences.Preferences.SubredditUrl, this.AllPreferences.Preferences.Range);
             }
+        }
+        private void SRLabel_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+        {
+            this.SRLabel.Visibility = Visibility.Hidden;
+            this.SRLabel.IsEnabled = false;
+            this.SRText.Visibility = Visibility.Visible;
         }
 
         private void SRText_GotKeyboardFocus(object sender, KeyboardFocusChangedEventArgs e)
@@ -137,6 +163,12 @@ namespace RedditFeed
                 e.Handled = true;
                 this.SRText.Focus();
             }
+        }
+
+        private async void ReloadBtn_Click(object sender, RoutedEventArgs e)
+        {
+            //this.LoadingLbl.Visibility = Visibility.Visible;
+            await this.ReloadAsync(this.AllPreferences.Preferences.SubredditUrl, this.AllPreferences.Preferences.Range);
         }
     }
 }
