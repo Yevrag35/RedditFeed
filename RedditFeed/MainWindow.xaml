@@ -160,6 +160,7 @@
                 <GridView>
                     <GridView.Columns>
                         <GridViewColumn Header="Updated" DisplayMemberBinding="{Binding Path=Updated}"/>
+                        <GridViewColumn Header="Author" DisplayMemberBinding="{Binding Path=Author}" />
                         <GridViewColumn Header="Title" DisplayMemberBinding="{Binding Path=Title}"/>
                     </GridView.Columns>
                 </GridView>

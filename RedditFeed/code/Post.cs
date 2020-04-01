@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Runtime.Serialization;
 using System.Text;
 using System.Xml;
 
@@ -40,16 +41,8 @@ namespace RedditFeed
         public void GoTo() => this.GoTo(this.Link.ToString());
         private void GoTo(string url)
         {
-            try
-            {
-                Process.Start(url);
-            }
-            catch (Win32Exception)
-            {
-                // hack because of this: https://github.com/dotnet/corefx/issues/10361
-                url = url.Replace("&", "^&");
-                Process.Start(new ProcessStartInfo("cmd", $"/c start {url}") { CreateNoWindow = true });
-            }
+            url = url.Replace("&", "^&");
+            Process.Start(new ProcessStartInfo("cmd", $"/c start {url}") { CreateNoWindow = true });
         }
 
     }
@@ -61,6 +54,15 @@ namespace RedditFeed
         public string Name { get; private set; }
         [JsonProperty("uri")]
         public Uri Link { get; private set; }
+
+        [OnDeserialized]
+        private void OnDeserialized(StreamingContext ctx)
+        {
+            if (!string.IsNullOrEmpty(this.Name))
+            {
+                this.Name = this.Name.Replace("/u/", string.Empty);
+            }
+        }
     }
 
     [JsonObject(MemberSerialization.OptIn)]

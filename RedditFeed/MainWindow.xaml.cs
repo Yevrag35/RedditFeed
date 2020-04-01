@@ -171,6 +171,7 @@ namespace RedditFeed
             //this.LoadingLbl.Visibility = Visibility.Visible;
             this.ReloadBtn.IsEnabled = false;
             await this.ReloadAsync(this.AllPreferences.Preferences.SubredditUrl, this.AllPreferences.Preferences.Range);
+            GC.Collect();
         }
 
         
