@@ -105,6 +105,7 @@ namespace RedditFeed
                 {
                     ((MainWindow)Application.Current.MainWindow).Posts.Add(p);
                 }
+                ((MainWindow)Application.Current.MainWindow).ReloadBtn.IsEnabled = true;
             });
         }
 
@@ -168,7 +169,10 @@ namespace RedditFeed
         private async void ReloadBtn_Click(object sender, RoutedEventArgs e)
         {
             //this.LoadingLbl.Visibility = Visibility.Visible;
+            this.ReloadBtn.IsEnabled = false;
             await this.ReloadAsync(this.AllPreferences.Preferences.SubredditUrl, this.AllPreferences.Preferences.Range);
         }
+
+        
     }
 }

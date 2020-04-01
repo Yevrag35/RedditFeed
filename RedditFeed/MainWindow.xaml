@@ -4,6 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:RedditFeed"
+        xmlns:gif="http://wpfanimatedgif.codeplex.com"
         mc:Ignorable="d"
         DataContext="{Binding RelativeSource={RelativeSource Self}}"
         WindowStartupLocation="CenterScreen"
@@ -165,7 +166,13 @@
             </ListView.View>
         </ListView>
         <Button x:Name="ReloadBtn" Content="RELOAD" HorizontalAlignment="Left" Margin="40,0,0,0" VerticalAlignment="Top" Width="95" Height="39"
-                Click="ReloadBtn_Click"/>
+                Click="ReloadBtn_Click" IsEnabledChanged="ReloadBtn_IsEnabledChanged"/>
+        <Button x:Name="ReloadBtnLoading" IsEnabled="False" 
+                HorizontalAlignment="Left" Margin="40,0,0,0" VerticalAlignment="Top" Width="95" Height="39"
+                IsVisibleChanged="ReloadBtnLoading_IsVisibleChanged" Visibility="Hidden">
+            <Image x:Name="LoadingGif" gif:ImageBehavior.AnimatedSource="media/Loading_icon.gif"
+                   gif:ImageBehavior.AutoStart="False" gif:ImageBehavior.AnimationLoaded="LoadingGif_AnimationLoaded"/>
+        </Button>
         <!--  Content="placeHolder" -->
         <Label x:Name="SRLabel" Content="{Binding Path=SubredditLabel}" Visibility="Visible" Margin="313,6,0,0"
                VerticalAlignment="Top" Width="185" Height="26" HorizontalAlignment="Left"
