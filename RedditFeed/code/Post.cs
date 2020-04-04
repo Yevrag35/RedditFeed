@@ -2,11 +2,8 @@
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Diagnostics;
 using System.Runtime.Serialization;
-using System.Text;
-using System.Xml;
 
 namespace RedditFeed
 {
@@ -31,11 +28,12 @@ namespace RedditFeed
         public string Title { get; private set; }
 
         [JsonProperty("updated")]
-        public DateTime Updated { get; private set; }
+        public DateTime LastUpdated { get; private set; }
+        public string Updated { get; private set; }
 
         public int CompareTo(Post other)
         {
-            return this.Updated.CompareTo(other.Updated);
+            return this.LastUpdated.CompareTo(other.LastUpdated);
         }
 
         public void GoTo() => this.GoTo(this.Link.ToString());
@@ -45,6 +43,12 @@ namespace RedditFeed
             Process.Start(new ProcessStartInfo("cmd", $"/c start {url}") { CreateNoWindow = true });
         }
 
+        private const string DATE_FORMAT = "M/d h:mm tt";
+        [OnDeserialized]
+        private void OnDeserialized(StreamingContext ctx)
+        {
+            this.Updated = LastUpdated.ToLocalTime().ToString(DATE_FORMAT);
+        }
     }
 
     [JsonObject(MemberSerialization.OptIn)]

@@ -21,7 +21,7 @@ namespace RedditFeed
         {
             DateFormatHandling = DateFormatHandling.IsoDateFormat,
             DateParseHandling = DateParseHandling.DateTime,
-            DateTimeZoneHandling = DateTimeZoneHandling.Local
+            DateTimeZoneHandling = DateTimeZoneHandling.Utc
         };
 
         public Uri FeedUrl { get; private set; }
@@ -38,8 +38,8 @@ namespace RedditFeed
 
         public void UpdateView()
         {
-            _backingView = CollectionViewSource.GetDefaultView(this) as ListCollectionView;
-            this.AddSortDescription(x => x.Updated, ListSortDirection.Descending);
+            _backingView = CollectionViewSource.GetDefaultView(base.Items) as ListCollectionView;
+            this.AddSortDescription(x => x.LastUpdated, ListSortDirection.Descending);
         }
         public void UpdateView(Expression<Func<Post, object>> propEx, ListSortDirection direction)
         {
@@ -111,7 +111,7 @@ namespace RedditFeed
             feedUrl = builder.Uri;
 
             var xml = new XmlDocument();
-            xml.Load(feedUrl.ToString());
+            xml.Load(feedUrl.AbsoluteUri);
 
             return JObject.Parse(JsonConvert.SerializeXmlNode(xml));
         }
