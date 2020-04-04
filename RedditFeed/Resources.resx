@@ -123,6 +123,9 @@
   <data name="DefaultSubreddit" xml:space="preserve">
     <value>PowerShell</value>
   </data>
+  <data name="Post_Updated_DateString" xml:space="preserve">
+    <value>M/d h:mm tt</value>
+  </data>
   <data name="RedditUrlFormat" xml:space="preserve">
     <value>https://www.reddit.com/r/{0}/.rss</value>
   </data>

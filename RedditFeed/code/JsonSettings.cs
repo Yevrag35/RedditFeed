@@ -79,7 +79,6 @@ namespace RedditFeed
             if (newSub != this.Preferences.Subreddit && !isLoading)
             {
                 this.Preferences.Subreddit = newSub;
-                this.Preferences.UpdateUrl();
                 this.Save();
             }
         }
@@ -104,6 +103,7 @@ namespace RedditFeed
             string[] restOfPath = Path
                 .GetDirectoryName(Resources.DefaultSettingsPath)
                     .Split(@"\", StringSplitOptions.RemoveEmptyEntries);
+
             List<string> list = new List<string>(restOfPath);
 
             for (int i = 0; i < list.Count; i++)

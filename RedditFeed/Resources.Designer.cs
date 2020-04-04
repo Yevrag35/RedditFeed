@@ -79,6 +79,15 @@ namespace RedditFeed {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to M/d h:mm tt.
+        /// </summary>
+        public static string Post_Updated_DateString {
+            get {
+                return ResourceManager.GetString("Post_Updated_DateString", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to https://www.reddit.com/r/{0}/.rss.
         /// </summary>
         public static string RedditUrlFormat {

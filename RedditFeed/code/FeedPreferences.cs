@@ -9,8 +9,35 @@ namespace RedditFeed
     [JsonObject(MemberSerialization.OptIn)]
     public class FeedPreferences
     {
+        private string _dtFormat;
+        [JsonProperty("dateTimeFormat")]
+        public string DateTimeFormat
+        {
+            get => _dtFormat;
+            set
+            {
+                if (!string.IsNullOrWhiteSpace(value))
+                    _dtFormat = value;
+
+                else
+                    _dtFormat = Resources.Post_Updated_DateString;
+
+            }
+        }
+
+
+        private string _sub;
+
         [JsonProperty("subreddit", Order = 1)]
-        public string Subreddit { get; set; }
+        public string Subreddit
+        {
+            get => _sub;
+            set
+            {
+                _sub = value;
+                this.UpdateUrl(!string.IsNullOrWhiteSpace(value));
+            }
+        }
 
         #region JSON PROPERTIES
         [JsonProperty("rangeOfPosts", Order = 2)]
@@ -22,24 +49,41 @@ namespace RedditFeed
         [OnSerializing]
         private void OnSerializing(StreamingContext ctx)
         {
-            if (string.IsNullOrWhiteSpace(Subreddit))
+            if (string.IsNullOrWhiteSpace(this.Subreddit))
             {
                 Subreddit = Resources.DefaultSubreddit;
             }
+            if (string.IsNullOrWhiteSpace(this.DateTimeFormat))
+                this.DateTimeFormat = Resources.Post_Updated_DateString;
         }
 
         [OnDeserialized]
         private void OnDeserialized(StreamingContext ctx)
         {
-            if (string.IsNullOrWhiteSpace(Subreddit))
+            if (string.IsNullOrWhiteSpace(this.Subreddit))
             {
-                Subreddit = Resources.DefaultSubreddit;
+                this.Subreddit = Resources.DefaultSubreddit;
             }
-            this.SetUrl(new Uri(string.Format(Resources.RedditUrlFormat, Subreddit), UriKind.Absolute));
+            if (string.IsNullOrWhiteSpace(this.DateTimeFormat))
+                this.DateTimeFormat = Resources.Post_Updated_DateString;
         }
 
-        internal void UpdateUrl() => this.SubredditUrl = new Uri(string.Format(Resources.RedditUrlFormat, this.Subreddit), UriKind.Absolute);
-        public void SetUrl(Uri newUrl) => this.SubredditUrl = newUrl;
+        private void UpdateUrl(bool defined)
+        {
+            if (defined)
+            {
+                this.SubredditUrl = new Uri(
+                    string.Format(
+                        Resources.RedditUrlFormat, this.Subreddit
+                    ),
+                    UriKind.Absolute
+                );
+            }
+            else
+            {
+                this.SubredditUrl = null;
+            }
+        }
 
         #endregion
     }

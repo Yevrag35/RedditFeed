@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Linq;
+using System.Resources;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -26,12 +27,7 @@ namespace RedditFeed
     /// </summary>
     public partial class MainWindow : Window
     {
-        //private static readonly string[] DOTS = new string[3]
-        //{
-        //    ".",
-        //    "..",
-        //    "..."
-        //};
+        internal static string DateFormat;
         private static bool _isLoading = true;
         //private const string LOADING_FORMAT = "Loading{0}";
 
@@ -48,6 +44,7 @@ namespace RedditFeed
         public MainWindow()
         {
             this.AllPreferences = new JsonSettings(true);
+            DateFormat = this.AllPreferences.Preferences.DateTimeFormat;
 
             InitializeComponent();
             this.SRText.Text = this.AllPreferences.Preferences.Subreddit;

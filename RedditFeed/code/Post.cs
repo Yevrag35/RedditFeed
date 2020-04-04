@@ -43,11 +43,10 @@ namespace RedditFeed
             Process.Start(new ProcessStartInfo("cmd", $"/c start {url}") { CreateNoWindow = true });
         }
 
-        private const string DATE_FORMAT = "M/d h:mm tt";
         [OnDeserialized]
         private void OnDeserialized(StreamingContext ctx)
         {
-            this.Updated = LastUpdated.ToLocalTime().ToString(DATE_FORMAT);
+            this.Updated = LastUpdated.ToLocalTime().ToString(MainWindow.DateFormat);
         }
     }
 
