@@ -25,9 +25,10 @@ namespace RedditFeed
             }
         }
 
+        [JsonProperty("hideAuthor")]
+        public bool HideAuthorColumn { get; set; } = false;
 
         private string _sub;
-
         [JsonProperty("subreddit", Order = 1)]
         public string Subreddit
         {
